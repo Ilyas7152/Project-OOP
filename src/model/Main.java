@@ -1,99 +1,103 @@
 package model;
 
-import java.awt.*;
+import java.util.ArrayList;
+import java.util.Scanner;
 
 public class Main {
-     public static void main(String[] args) {
-     System.out.println("---Grocery Store Management System");
-         System.out.println();
-     Product n1=new Product(250,1,"apple",30);
-     Product n2=new Product(300,2,"banana",30);
-     Product n3=new Product(700,130,"chocolate",50);
-         System.out.println();
-     Customer c1=new Customer(11,"Ivan","8777321201",1500);
-     Customer c2=new Customer(22,"Alexandr","8000010101",2000);
-     Customer c3=new Customer(33,"Ruslan","8558430190",5000);
-         System.out.println();
-     Order o1=new Order(111,n1,c1,20);
-     Order o2=new Order(222,n3,c3,7);
+    private static ArrayList<Product> products = new ArrayList<>();
+    private static ArrayList<Customer> customers = new ArrayList<>();
+    private static ArrayList<Order> orders = new ArrayList<>();
+    private static Scanner scanner = new Scanner(System.in);
 
-         System.out.println();
-     System.out.println("---Menu Products---");
-     System.out.println(n1);
-     System.out.println(n2);
-     System.out.println(n3);
-         System.out.println();
+    public static void main(String[] args) {
+        initializeData();
 
-     System.out.println("---Menu Customers---");
-     System.out.println(c1);
-     System.out.println(c2);
-     System.out.println(c3);
-         System.out.println();
-     System.out.println("---Menu Orders---");
-     System.out.println(o1);
-     System.out.println(o2);
-         System.out.println();
-     System.out.println("--- TESTING GETTERS ---");
-         System.out.println("Product name: " + n1.getName());
-         System.out.println("Product price: " + n1.getPrice());
-         System.out.println("Product id:"+n1.getId());
-         System.out.println("Product stock:"+n1.getStock());
-         System.out.println("Customer name: " + c1.getName());
-         System.out.println("Customer id:"+c1.getid());
-         System.out.println("Customer phoneNum:"+c1.getPhoneNum());
-         System.out.println("Customer money: " + c1.getMoney());
-         System.out.println("Order quantity: " + o1.getQuantity());
+        while (true) {
+            System.out.println("\n1. View Products  2. Add Product");
+            System.out.println("3. View Customers 4. Add Customer");
+            System.out.println("5. View Orders    6. Filter Fresh");
+            System.out.println("0. Exit");
+            System.out.print("Choice: ");
 
-         System.out.println();
+            if (!scanner.hasNextInt()) {
+                scanner.next();
+                continue;
+            }
 
-         System.out.println("---Testing setters---");
-         System.out.println("Updating item3...");
-         n1.setName("Tea");
-         n1.setId(7);
-         n1.setPrice(377.77);
-         n1.setStock(15);
-         System.out.println("Updated:"+n1);
-         System.out.println();
+            int choice = scanner.nextInt();
+            scanner.nextLine();
 
-         System.out.println("---TESTING CUSTOMER METHODS---");
-         c1.pay(1000);
-         System.out.println("Ivan bought 4 apples and our new balance is " + c1.getMoney());
-         c1.addMoney(2000);
-         System.out.println("Ivan added money to his account "+ c1.getMoney());
-         System.out.println();
+            if (choice == 0) break;
 
+            switch (choice) {
+                case 1 -> showList(products);
+                case 2 -> addNewProduct();
+                case 3 -> showList(customers);
+                case 4 -> addNewCustomer();
+                case 5 -> showList(orders);
+                case 6 -> filterFresh();
+                default -> System.out.println("Invalid choice!");
+            }
+        }
+    }
 
-         System.out.println("--- TESTING PRODUCT METHODS ---");
-         n1.sellProduct(3);
-         System.out.println(n1.getStock());
-         n1.stockStatus();
-         System.out.println(n1.stockStatus());
-         System.out.println();
+    private static void addNewCustomer() {
+        System.out.print("Name: ");
+        String name = scanner.nextLine();
+        System.out.print("Phone: ");
+        String phone = scanner.nextLine();
+        System.out.print("Balance: ");
+        double balance = scanner.nextDouble();
+        scanner.nextLine();
 
-         System.out.println("---TESTING ORDER METHODS---");
+        customers.add(new Customer(customers.size() + 1, name, phone, balance));
+    }
 
-         System.out.println("Total price of order is:" + o1.getTotalPrice());
- o1.completeOrder();
-         System.out.println();
+    private static void addNewProduct() {
+        System.out.println("1.General 2.Fresh 3.Packaged");
+        int type = scanner.nextInt();
+        scanner.nextLine();
 
+        System.out.print("Name: ");
+        String name = scanner.nextLine();
+        System.out.print("Price: ");
+        double price = scanner.nextDouble();
+        System.out.print("Stock: ");
+        int stock = scanner.nextInt();
+        scanner.nextLine();
 
- System.out.println("---FINAL STATE---");
- System.out.println("Products in stock:");
-         System.out.println(n1);
-         System.out.println(n2);
-         System.out.println(n3);
-         System.out.println();
+        int id = products.size() + 1;
+        if (type == 2) {
+            System.out.print("Days: ");
+            int days = scanner.nextInt();
+            scanner.nextLine();
+            products.add(new FreshProduct(price, id, name, stock, days));
+        } else if (type == 3) {
+            System.out.print("Brand: ");
+            String brand = scanner.nextLine();
+            products.add(new PackagedProduct(price, id, name, stock, brand));
+        } else {
+            products.add(new Product(price, id, name, stock));
+        }
+    }
 
-         System.out.println("Customers:");
-         System.out.println(c1);
-         System.out.println(c2);
-         System.out.println(c3);
-         System.out.println();
+    private static void showList(ArrayList<?> list) {
+        for (Object o : list) System.out.println(o);
+    }
 
-         System.out.println("Orders:");
-         System.out.println(o1);
-         System.out.println(o2);
+    private static void filterFresh() {
+        for (Product p : products) {
+            if (p instanceof FreshProduct fp) {
+                System.out.println(fp);
+            }
+        }
+    }
 
-
-         System.out.println("\n=== Program Complete===");
-     }}
+    private static void initializeData() {
+        Product p = new Product(100, 1, "Milk", 10);
+        Customer c = new Customer(1, "John", "123", 500);
+        products.add(p);
+        customers.add(c);
+        orders.add(new Order(101, p, c, 2));
+    }
+}

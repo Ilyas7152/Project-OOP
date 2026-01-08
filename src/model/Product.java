@@ -6,67 +6,57 @@ public class Product {
     private String name;
     private int stock;
 
-
-
     public Product(double price, int id, String name, int stock) {
-        this.price = price;
-        this.id = id;
-        this.name = name;
-        this.stock = stock;
+        setPrice(price);
+        setId(id);
+        setName(name);
+        setStock(stock);
     }
 
-    public int getId() {
-        return id;
-    }
-
-    public double getPrice() {
-        return price;
-    }
-
-    public int getStock() {
-        return stock;
-    }
-
-    public String getName() {
-        return name;
-    }
+    public int getId() { return id; }
+    public double getPrice() { return price; }
+    public int getStock() { return stock; }
+    public String getName() { return name; }
 
     public void setId(int id) {
-        this.id = id;
+        if (id >= 0) this.id = id;
+        else System.out.println("Error: ID can't be negative!");
     }
 
     public void setName(String name) {
-        this.name = name;
+        if (name != null && !name.trim().isEmpty()) this.name = name;
+        else System.out.println("Error: Name cannot be empty!");
     }
 
     public void setStock(int stock) {
-        this.stock = stock;
+        if (stock >= 0) this.stock = stock;
+        else System.out.println("Error: Stock can't be negative!");
     }
 
     public void setPrice(double price) {
-        this.price = price;
+        if (price >= 0) this.price = price;
+        else System.out.println("Error: Price can't be negative!");
     }
 
     public boolean sellProduct(int amount) {
-        if (stock >= amount) {
+        if (amount > 0 && stock >= amount) {
             stock -= amount;
             return true;
         }
-        System.out.println("Unfortunately we can't sell it to you because we don't have so many products in stock");
+        System.out.println("Insufficient stock!");
         return false;
     }
 
-    public String stockStatus() {
-       if(stock>0){
-           return "in Stock";
-       }
-       return "out of Stock";
-    }
+    public String getType() { return "Product"; }
+
+
 
     @Override
-    public String toString(){
-        return "(price: "+price + ", id: "+id +",  name: "+ name + ", stock: "+stock+")";
+    public String toString() {
+        return "[" + getType() + "] " +
+                "(price: " + price +
+                ", id: " + id +
+                ", name: " + name +
+                ", stock: " + stock + ")";
     }
-
 }
-
