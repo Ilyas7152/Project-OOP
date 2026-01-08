@@ -1,10 +1,10 @@
 package model;
 
 public class Product {
-    private double price;
-    private int id;
-    private String name;
-    private int stock;
+   protected double price;
+    protected int id;
+    protected String name;
+    protected int stock;
 
     public Product(double price, int id, String name, int stock) {
         setPrice(price);
