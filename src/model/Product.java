@@ -14,6 +14,9 @@ public class Product {
         this.name = name;
         this.stock = stock;
     }
+    public Product(){
+
+    }
 
     public int getId() {
         return id;
