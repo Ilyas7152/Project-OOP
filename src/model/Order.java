@@ -15,37 +15,54 @@ public class Order {
 
     public int getId() { return id; }
     public int getQuantity() { return quantity; }
+    public Product getProduct() { return product; }
+    public Customer getCustomer() { return customer; }
 
     public void setId(int id) {
-        if (id > 0) this.id = id;
+        if (id <= 0) throw new IllegalArgumentException("Order id must be > 0");
+        this.id = id;
     }
 
     public void setQuantity(int quantity) {
-        if (quantity > 0) this.quantity = quantity;
+        if (quantity <= 0) throw new IllegalArgumentException("Quantity must be > 0");
+        this.quantity = quantity;
     }
 
-    public void setProduct(Product product) { this.product = product; }
-    public void setCustomer(Customer customer) { this.customer = customer; }
+    public void setProduct(Product product) {
+        if (product == null) throw new IllegalArgumentException("Product cannot be null");
+        this.product = product;
+    }
+
+    public void setCustomer(Customer customer) {
+        if (customer == null) throw new IllegalArgumentException("Customer cannot be null");
+        this.customer = customer;
+    }
 
     public double getTotalPrice() {
         double total = product.getPrice() * quantity;
+
         if (quantity >= 7) total *= 0.93;
         else if (quantity >= 3) total *= 0.97;
+
+        if (product instanceof Discountable d) {
+            total *= (1 - d.getDiscountPercent() / 100.0);
+        }
+
         return total;
     }
 
-    public boolean completeOrder() {
+    public void completeOrder() {
         double total = getTotalPrice();
-        if (product.sellProduct(quantity) && customer.pay(total)) {
-            System.out.println("Order was completed");
-            return true;
-        }
-        System.out.println("Order failed");
-        return false;
+        product.sellProduct(quantity);
+        customer.pay(total);
     }
 
     @Override
     public String toString() {
-        return "Order(id: " + id + ", product: " + product.getName() + ", customer: " + customer.getName() + ", qty: " + quantity + ")";
+        return "Order(id: " + id +
+                ", product: " + product.getName() +
+                ", customer: " + customer.getName() +
+                ", qty: " + quantity +
+                ", total: " + getTotalPrice() + ")";
     }
 }

@@ -6,60 +6,53 @@ public class Customer {
     private double money;
     private String phoneNum;
 
-    public Customer(int id, String name, String phoneNum, double money){
-        this.id= id;
-        this.name=name;
-        this.phoneNum=phoneNum;
-        this.money=money;
-
+    public Customer(int id, String name, String phoneNum, double money) {
+        setId(id);
+        setName(name);
+        setPhoneNum(phoneNum);
+        setMoney(money);
     }
 
-    public int getid() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public double getMoney() {
-        return money;
-    }
-
-    public String getPhoneNum() {
-        return phoneNum;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
+    public int getId() { return id; }
+    public String getName() { return name; }
+    public double getMoney() { return money; }
+    public String getPhoneNum() { return phoneNum; }
 
     public void setId(int id) {
+        if (id <= 0) throw new IllegalArgumentException("Customer id must be > 0");
         this.id = id;
     }
 
+    public void setName(String name) {
+        if (name == null || name.trim().isEmpty())
+            throw new IllegalArgumentException("Customer name cannot be empty");
+        this.name = name.trim();
+    }
+
     public void setMoney(double money) {
+        if (money < 0) throw new IllegalArgumentException("Money cannot be negative");
         this.money = money;
     }
 
     public void setPhoneNum(String phoneNum) {
-        this.phoneNum = phoneNum;
-    }
-    public boolean pay(double amount){
-        if(money>=amount){
-            money -=amount;
-            return true;
+        if (phoneNum == null || phoneNum.trim().isEmpty())
+            throw new IllegalArgumentException("Phone cannot be empty");
+        this.phoneNum = phoneNum.trim();
     }
 
-    return false;}
-    public void addMoney(double amount){
-        money+=amount;
+    public void pay(double amount) {
+        if (amount <= 0) throw new IllegalArgumentException("Amount must be > 0");
+        if (money < amount) throw new IllegalArgumentException("Not enough money");
+        money -= amount;
     }
+
+    public void addMoney(double amount) {
+        if (amount <= 0) throw new IllegalArgumentException("Amount must be > 0");
+        money += amount;
+    }
+
     @Override
-    public String toString(){
-        return "(id :" +id + ", name: "+ name +", phoneNum :"+phoneNum+", money :"+money+")";
+    public String toString() {
+        return "(id: " + id + ", name: " + name + ", phoneNum: " + phoneNum + ", money: " + money + ")";
     }
-    }
-
-
-
+}
