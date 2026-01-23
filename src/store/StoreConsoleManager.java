@@ -37,51 +37,31 @@ public class StoreConsoleManager implements StoreConsole {
             displayMenu();
 
             try {
-                int choice = readInt();
+                int choice = scanner.nextInt();
+                scanner.nextLine();
                 if (choice == 0) break;
 
                 switch (choice) {
-                    case 1 -> showList(products);
-                    case 2 -> addNewProduct();
-                    case 3 -> showList(customers);
-                    case 4 -> addNewCustomer();
-                    case 5 -> showList(orders);
-                    case 6 -> filterFresh();
-                    case 7 -> createAndCompleteOrder();
-                    default -> System.out.println("Invalid choice!");
+                    case 1 : showList(products);
+                        break;
+                    case 2 : addNewProduct();break;
+                    case 3 : showList(customers);break;
+                    case 4 : addNewCustomer();break;
+                    case 5 : showList(orders);break;
+                    case 6 : createAndCompleteOrder();break;
+                    default : System.out.println("Invalid choice!");
                 }
 
             } catch (InvalidInputException e) {
                 System.out.println("Input error: " + e.getMessage());
             } catch (IllegalArgumentException e) {
                 System.out.println("Validation error: " + e.getMessage());
-            } catch (Exception e) {
-                System.out.println("Unexpected error: " + e.getMessage());
             }
         }
 
         scanner.close();
     }
-
-
-    private int readInt() throws InvalidInputException {
-        try {
-            return Integer.parseInt(scanner.nextLine().trim());
-        } catch (Exception e) {
-            throw new InvalidInputException("Expected integer number");
-        }
-    }
-
-    private double readDouble() throws InvalidInputException {
-        try {
-            return Double.parseDouble(scanner.nextLine().trim());
-        } catch (Exception e) {
-            throw new InvalidInputException("Expected numeric value");
-        }
-    }
-
-    // it is menu act.
-    private void addNewCustomer() throws InvalidInputException {
+    private void addNewCustomer()  {
         System.out.print("Name: ");
         String name = scanner.nextLine();
 
@@ -89,35 +69,40 @@ public class StoreConsoleManager implements StoreConsole {
         String phone = scanner.nextLine();
 
         System.out.print("Balance: ");
-        double balance = readDouble();
+        double balance = scanner.nextDouble();
+        scanner.nextLine();
 
         customers.add(new Customer(customers.size() + 1, name, phone, balance));
         System.out.println("Customer added!");
     }
 
-    private void addNewProduct() throws InvalidInputException {
+    private void addNewProduct()  {
         System.out.println("1) Fresh product");
         System.out.println("2) Packaged product");
         System.out.print("Type: ");
-        int type = readInt();
+        int type = scanner.nextInt();
+        scanner.nextLine();
 
         System.out.print("Name: ");
         String name = scanner.nextLine();
 
         System.out.print("Price: ");
-        double price = readDouble();
-
+        double price = scanner.nextDouble();
+        scanner.nextLine();
         System.out.print("Stock: ");
-        int stock = readInt();
+        int stock = scanner.nextInt();
+        scanner.nextLine();
 
         int id = products.size() + 1;
 
         if (type == 1) {
             System.out.print("Days to expire: ");
-            int days = readInt();
+            int days = scanner.nextInt();
+            scanner.nextLine();
 
             System.out.print("Discount% (0..100): ");
-            double disc = readDouble();
+            double disc = scanner.nextDouble();
+            scanner.nextLine();
 
             products.add(new FreshProduct(price, id, name, stock, days, disc));
 
@@ -126,7 +111,8 @@ public class StoreConsoleManager implements StoreConsole {
             String brand = scanner.nextLine();
 
             System.out.print("Discount% (0..100): ");
-            double disc = readDouble();
+            double disc = scanner.nextDouble();
+            scanner.nextLine();
 
             products.add(new PackagedProduct(price, id, name, stock, brand, disc));
 
@@ -139,10 +125,7 @@ public class StoreConsoleManager implements StoreConsole {
     }
 
     private void createAndCompleteOrder() throws InvalidInputException {
-        if (customers.isEmpty() || products.isEmpty()) {
-            System.out.println("Add at least 1 customer and 1 product first.");
-            return;
-        }
+
 
         System.out.println("Customers:");
         for (int i = 0; i < customers.size(); i++) {
@@ -150,7 +133,8 @@ public class StoreConsoleManager implements StoreConsole {
         }
 
         System.out.print("Choose customer: ");
-        int cIndex = readInt() - 1;
+        int cIndex = scanner.nextInt() - 1;
+        scanner.nextLine();
 
         System.out.println("\nProducts:");
         for (int i = 0; i < products.size(); i++) {
@@ -158,10 +142,12 @@ public class StoreConsoleManager implements StoreConsole {
         }
 
         System.out.print("Choose product: ");
-        int pIndex = readInt() - 1;
+        int pIndex = scanner.nextInt() - 1;
+        scanner.nextLine();
 
         System.out.print("Quantity: ");
-        int qty = readInt();
+        int qty = scanner.nextInt();
+        scanner.nextLine();
 
         Customer c = customers.get(cIndex);
         Product p = products.get(pIndex);
@@ -173,16 +159,7 @@ public class StoreConsoleManager implements StoreConsole {
         System.out.println("Order completed: " + order);
     }
 
-    private void filterFresh() {
-        boolean found = false;
-        for (Product p : products) {
-            if (p instanceof FreshProduct) {
-                System.out.println(p);
-                found = true;
-            }
-        }
-        if (!found) System.out.println("No fresh products found.");
-    }
+
 
     private void showList(ArrayList<?> list) {
         if (list.isEmpty()) {
