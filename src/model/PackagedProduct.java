@@ -13,7 +13,7 @@ public class PackagedProduct extends Product implements Discountable {
     public String getBrand() { return brand; }
 
     public void setBrand(String brand) {
-        if (brand == null || brand.trim().isEmpty())
+        if (brand == null)
             throw new IllegalArgumentException("Brand cannot be empty");
         this.brand = brand.trim();
     }

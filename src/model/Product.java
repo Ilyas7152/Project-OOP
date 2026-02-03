@@ -1,4 +1,6 @@
 package model;
+import java.sql.Connection;
+import java.sql.DriverManager;
 
 public abstract class Product {
     protected double price;

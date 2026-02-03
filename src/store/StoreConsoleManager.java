@@ -163,7 +163,7 @@ public class StoreConsoleManager implements StoreConsole {
 
     private void showList(ArrayList<?> list) {
         if (list.isEmpty()) {
-            System.out.println("List is empty.");
+            System.out.println("Empty list");
             return;
         }
         for (Object o : list) System.out.println(o);

@@ -35,9 +35,9 @@ public class Customer {
     }
 
     public void setPhoneNum(String phoneNum) {
-        if (phoneNum == null || phoneNum.trim().isEmpty())
+        if (phoneNum == null)
             throw new IllegalArgumentException("Phone cannot be empty");
-        this.phoneNum = phoneNum.trim();
+        this.phoneNum = phoneNum;
     }
 
     public void pay(double amount) {
