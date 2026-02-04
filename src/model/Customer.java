@@ -35,9 +35,9 @@ public class Customer {
     }
 
     public void setPhoneNum(String phoneNum) {
-        if (phoneNum == null)
+        if (phoneNum == null || phoneNum.trim().isEmpty())
             throw new IllegalArgumentException("Phone cannot be empty");
-        this.phoneNum = phoneNum;
+        this.phoneNum = phoneNum.trim();
     }
 
     public void pay(double amount) {
@@ -46,13 +46,8 @@ public class Customer {
         money -= amount;
     }
 
-    public void addMoney(double amount) {
-        if (amount <= 0) throw new IllegalArgumentException("Amount must be > 0");
-        money += amount;
-    }
-
     @Override
     public String toString() {
-        return "(id: " + id + ", name: " + name + ", phoneNum: " + phoneNum + ", money: " + money + ")";
+        return "(id=" + id + ", name=" + name + ", phone=" + phoneNum + ", money=" + money + ")";
     }
 }

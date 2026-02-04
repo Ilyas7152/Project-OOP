@@ -1,90 +1,170 @@
 package database;
-import model.Customer;
+
 import model.Product;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ProductDao {
 
-    public void insertProduct(Product product) {
-        String sql = "INSERT INTO PRODUCT (id,name, stock,price) VALUES (?, ?, ?, ?)";
-        Connection connection =DatabaseConnection.getConnection();
-        try{
-            PreparedStatement statement = connection.prepareStatement(sql);
+
+    public void createProduct(Product product) throws SQLException {
+        String sql = "INSERT INTO product (id, name, stock, price) VALUES (?, ?, ?, ?)";
+
+        try (Connection connection = DatabaseConnection.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+
             statement.setInt(1, product.getId());
             statement.setString(2, product.getName());
-            statement.setInt(3,product.getStock());
+            statement.setInt(3, product.getStock());
             statement.setDouble(4, product.getPrice());
 
+            statement.executeUpdate();
+        }
+    }
 
-            int rowsInserted = statement.executeUpdate();
-            if (rowsInserted > 0) {
-                System.out.println("Products inserted successfully");
+
+    public List<Product> readAllProducts() throws SQLException {
+        List<Product> products = new ArrayList<>();
+
+        String sql = "SELECT * FROM product ORDER BY id";
+
+        try (Connection connection = DatabaseConnection.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql);
+             ResultSet rs = statement.executeQuery()) {
+
+            while (rs.next()) {
+                products.add(extractProductFromResultSet(rs));
             }
+        }
+
+        return products;
+    }
+
+
+    public boolean updateProductBasic(int id, String name, int stock, double price) throws SQLException {
+        String sql = "UPDATE product SET name = ?, stock = ?, price = ? WHERE id = ?";
+
+        try (Connection connection = DatabaseConnection.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+
+            statement.setString(1, name);
+            statement.setInt(2, stock);
+            statement.setDouble(3, price);
+            statement.setInt(4, id);
+
+            return statement.executeUpdate() > 0;
+        }
+    }
+
+
+    public boolean deleteProductById(int id) throws SQLException {
+        String sql = "DELETE FROM product WHERE id = ?";
+
+        try (Connection connection = DatabaseConnection.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+
+            statement.setInt(1, id);
+            return statement.executeUpdate() > 0;
+        }
+    }
+
+    public List<Product> searchByName(String name) throws SQLException {
+        String sql = "SELECT * FROM product WHERE name ILIKE ? ORDER BY name";
+        List<Product> products = new ArrayList<>();
+
+        try (Connection connection = DatabaseConnection.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+
+            statement.setString(1, "%" + name + "%");
+
+            try (ResultSet rs = statement.executeQuery()) {
+                while (rs.next()) {
+                    products.add(extractProductFromResultSet(rs));
+                }
+            }
+        }
+        return products;
+    }
+    public List<Product> searchByPriceRange(double minPrice, double maxPrice) {
+        List<Product> productList = new ArrayList<>();
+
+        String sql = "SELECT * FROM product " +
+                "WHERE price BETWEEN ? AND ? " +
+                "ORDER BY price ASC";
+
+        try {
+            Connection connection = DatabaseConnection.getConnection();
+
+            PreparedStatement statement = connection.prepareStatement(sql);
+            statement.setDouble(1, minPrice);
+            statement.setDouble(2, maxPrice);
+
+            ResultSet resultSet = statement.executeQuery();
+
+            while (resultSet.next()) {
+                Product product = extractProductFromResultSet(resultSet);
+                productList.add(product);
+            }
+
+            resultSet.close();
             statement.close();
+            DatabaseConnection.closeConnection(connection);
+
+            System.out.println("✅ Found " + productList.size() + " products");
+
         } catch (SQLException e) {
-            System.out.println("Insert failed");
+            System.out.println("❌ Search failed");
+            e.printStackTrace();
+        }
+
+        return productList;
+    }
+    public List<Product> searchByMinPrice(double minPrice) {
+        List<Product> productList = new ArrayList<>();
+
+        String sql = "SELECT * FROM product " +
+                "WHERE price >= ? " +
+                "ORDER BY price ASC";
+
+        Connection connection = null;
+
+        try {
+            connection = DatabaseConnection.getConnection();
+            if (connection == null) return productList;
+
+            PreparedStatement statement = connection.prepareStatement(sql);
+            statement.setDouble(1, minPrice);
+
+            ResultSet resultSet = statement.executeQuery();
+
+            while (resultSet.next()) {
+                Product product = extractProductFromResultSet(resultSet);
+                if (product != null) {
+                    productList.add(product);
+                }
+            }
+
+            resultSet.close();
+            statement.close();
+
+        } catch (SQLException e) {
             e.printStackTrace();
         } finally {
             DatabaseConnection.closeConnection(connection);
         }
+
+        return productList;
     }
 
 
-    public void getAllProduct(){
-        String sql = "SELECT * FROM product";
-        Connection connection = DatabaseConnection.getConnection();
-        try{
-            PreparedStatement statement = connection.prepareStatement(sql);
-            ResultSet resultSet =statement.executeQuery();
-            System.out.println("\n All products from database");
-            while (resultSet.next()){
-                double price = resultSet.getDouble("price");
-                int id = resultSet.getInt("id");
-                String name = resultSet.getString("name");
-                int stock = resultSet.getInt("Stock");
+    private Product extractProductFromResultSet(ResultSet rs) throws SQLException {
+                int id = rs.getInt("id");
+                String name = rs.getString("name");
+                int stock = rs.getInt("stock");
+                double price = rs.getDouble("price");
 
-                System.out.println("price: "+ price);
-                System.out.println("id: "+ id);
-                System.out.println("name: "+ name);
-                System.out.println("stock: "+ stock);
-            }
-            resultSet.close();
-            statement.close();
-        }
-        catch(SQLException e){
-            System.out.println("Select failed");
-            e.printStackTrace();
-        } finally{
-            DatabaseConnection.closeConnection(connection);
-        }
-    }
+                return new Product(price, id, name, stock);
 
-
-public boolean updateProduct(Product product) {
-    String sql = "UPDATE product  SET Name = ?, id = ?," + "stock = ?, price=?" + "WHERE product_ID = ? AND product_type='Product'";
-    Connection connection = DatabaseConnection.getConnection();
-    if (connection == null) return false;
-try {
-    PreparedStatement statement=connection.prepareStatement(sql);
-    statement.setDouble(1,product.getPrice());
-    statement.setInt(2,product.getId());
-    statement.setInt(3,product.getStock());
-    statement.setString(4,product.getName());
-    int rowsUpdated = statement.executeUpdate();
-    statement.close();
-    if(rowsUpdated>0){
-        System.out.println("product updated"+ product.getName());
-        return true;
-    }
-} catch (SQLException e){
-    System.out.println("Update failed");
-    e.printStackTrace();
-
-}finally {
-    DatabaseConnection.closeConnection(connection);
-}
-return false;
-}}
+        }}

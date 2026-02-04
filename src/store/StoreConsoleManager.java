@@ -1,66 +1,73 @@
 package store;
 
+import database.ProductDao;
 import exception.InvalidInputException;
 import model.*;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 public class StoreConsoleManager implements StoreConsole {
-
-    private final ArrayList<Product> products = new ArrayList<>();
     private final ArrayList<Customer> customers = new ArrayList<>();
     private final ArrayList<Order> orders = new ArrayList<>();
     private final Scanner scanner = new Scanner(System.in);
+    private final ProductDao productDao = new ProductDao();
 
-    public StoreConsoleManager() {
-        initializeData();
-    }
+
 
     @Override
     public void displayMenu() {
-        System.out.println("\n===== STORE SYSTEM =====");
-        System.out.println("1) View Products");
-        System.out.println("2) Add Product");
-        System.out.println("3) View Customers");
-        System.out.println("4) Add Customer");
-        System.out.println("5) View Orders");
-        System.out.println("6) Filter Fresh Products");
-        System.out.println("7) Create Order & Complete");
+        System.out.println("\n===== GROCERY STORE (Week 8) =====");
+        System.out.println("1) Add Fresh Product");
+        System.out.println("2) Add Packaged Product");
+        System.out.println("3) View All Products");
+        System.out.println("4) Add new customer");
+        System.out.println("5) Show orders");
+        System.out.println("6) Show customers");
+        System.out.println("7) Update product");
+        System.out.println("8) Delete product");
+        System.out.println("9) Search by Name");
+        System.out.println("10) Search by Price Range");
+        System.out.println("11) Polymorphism Demo");
         System.out.println("0) Exit");
         System.out.print("Choice: ");
     }
 
     @Override
     public void run() {
-        while (true) {
-            displayMenu();
+        boolean running = true;
 
+        while (running) {
+            displayMenu();
             try {
-                int choice = scanner.nextInt();
-                scanner.nextLine();
-                if (choice == 0) break;
+                int choice = Integer.parseInt(scanner.nextLine());
 
                 switch (choice) {
-                    case 1 : showList(products);
-                        break;
-                    case 2 : addNewProduct();break;
-                    case 3 : showList(customers);break;
-                    case 4 : addNewCustomer();break;
-                    case 5 : showList(orders);break;
-                    case 6 : createAndCompleteOrder();break;
-                    default : System.out.println("Invalid choice!");
+                    case 1 -> addFreshProduct();
+                    case 2 -> addPackagedProduct();
+                    case 3 -> readAllProducts();
+                    case 4 -> addNewCustomer();
+                    case 5 ->showList(orders);
+                    case 6 -> showList(customers);
+                    case 7 -> updateProduct();
+                    case 8 -> deleteProduct();
+                    case 9 -> searchByName();
+                    case 10 -> searchByPriceRange();
+                    case 11 -> demonstratePolymorphism();
+
+                    case 0 -> running = false;
+                    default -> System.out.println("Invalid choice");
                 }
 
-            } catch (InvalidInputException e) {
-                System.out.println("Input error: " + e.getMessage());
-            } catch (IllegalArgumentException e) {
-                System.out.println("Validation error: " + e.getMessage());
+            } catch (Exception e) {
+                System.out.println("❌ Error: " + e.getMessage());
             }
         }
-
         scanner.close();
     }
+
     private void addNewCustomer()  {
         System.out.print("Name: ");
         String name = scanner.nextLine();
@@ -76,90 +83,103 @@ public class StoreConsoleManager implements StoreConsole {
         System.out.println("Customer added!");
     }
 
-    private void addNewProduct()  {
-        System.out.println("1) Fresh product");
-        System.out.println("2) Packaged product");
-        System.out.print("Type: ");
-        int type = scanner.nextInt();
-        scanner.nextLine();
+    private void addFreshProduct() throws SQLException {
+        System.out.print("ID: ");
+        int id = Integer.parseInt(scanner.nextLine());
 
         System.out.print("Name: ");
         String name = scanner.nextLine();
 
         System.out.print("Price: ");
-        double price = scanner.nextDouble();
-        scanner.nextLine();
+        double price = Double.parseDouble(scanner.nextLine());
+
         System.out.print("Stock: ");
-        int stock = scanner.nextInt();
-        scanner.nextLine();
+        int stock = Integer.parseInt(scanner.nextLine());
 
-        int id = products.size() + 1;
+        System.out.print("Days to expire: ");
+        int days = Integer.parseInt(scanner.nextLine());
 
-        if (type == 1) {
-            System.out.print("Days to expire: ");
-            int days = scanner.nextInt();
-            scanner.nextLine();
+        System.out.print("Discount%: ");
+        double discount = Double.parseDouble(scanner.nextLine());
 
-            System.out.print("Discount% (0..100): ");
-            double disc = scanner.nextDouble();
-            scanner.nextLine();
+        FreshProduct product =
+                new FreshProduct(price, id, name, stock, days, discount);
 
-            products.add(new FreshProduct(price, id, name, stock, days, disc));
+        productDao.createProduct(product);
+        System.out.println("✅ Fresh product added");
+    }
 
-        } else if (type == 2) {
-            System.out.print("Brand: ");
-            String brand = scanner.nextLine();
+    private void addPackagedProduct() throws SQLException {
+        System.out.print("ID: ");
+        int id = Integer.parseInt(scanner.nextLine());
 
-            System.out.print("Discount% (0..100): ");
-            double disc = scanner.nextDouble();
-            scanner.nextLine();
+        System.out.print("Name: ");
+        String name = scanner.nextLine();
 
-            products.add(new PackagedProduct(price, id, name, stock, brand, disc));
+        System.out.print("Price: ");
+        double price = Double.parseDouble(scanner.nextLine());
 
-        } else {
-            System.out.println("Unknown type.");
+        System.out.print("Stock: ");
+        int stock = Integer.parseInt(scanner.nextLine());
+
+        System.out.print("Brand: ");
+        String brand = scanner.nextLine();
+
+        System.out.print("Discount%: ");
+        double discount = Double.parseDouble(scanner.nextLine());
+
+        PackagedProduct product =
+                new PackagedProduct(price, id, name, stock, brand, discount);
+
+        productDao.createProduct(product);
+        System.out.println("✅ Packaged product added");
+    }
+
+
+    private void readAllProducts() throws SQLException {
+        List<Product> products = productDao.readAllProducts();
+        if (products.isEmpty()) {
+            System.out.println("📭 No products in database.");
+            return;
+        }
+        products.forEach(System.out::println);
+    }
+
+
+
+    private void updateProduct() throws SQLException {
+        System.out.print("Product ID: ");
+        int id = Integer.parseInt(scanner.nextLine());
+
+        System.out.print("New name: ");
+        String name = scanner.nextLine();
+
+        System.out.print("New stock: ");
+        int stock = Integer.parseInt(scanner.nextLine());
+
+        System.out.print("New price: ");
+        double price = Double.parseDouble(scanner.nextLine());
+
+        boolean ok = productDao.updateProductBasic(id, name, stock, price);
+        System.out.println(ok ? "✅ Updated" : "❌ Product not found");
+    }
+
+
+
+
+    private void deleteProduct() throws SQLException {
+        System.out.print("Product ID to delete: ");
+        int id = Integer.parseInt(scanner.nextLine());
+
+        System.out.print("Are you sure? (yes/no): ");
+        if (!scanner.nextLine().equalsIgnoreCase("yes")) {
+            System.out.println("Cancelled");
             return;
         }
 
-        System.out.println("Product added!");
+        boolean ok = productDao.deleteProductById(id);
+        System.out.println(ok ? "✅ Deleted" : "❌ Not found");
     }
-
-    private void createAndCompleteOrder() throws InvalidInputException {
-
-
-        System.out.println("Customers:");
-        for (int i = 0; i < customers.size(); i++) {
-            System.out.println((i + 1) + ") " + customers.get(i));
-        }
-
-        System.out.print("Choose customer: ");
-        int cIndex = scanner.nextInt() - 1;
-        scanner.nextLine();
-
-        System.out.println("\nProducts:");
-        for (int i = 0; i < products.size(); i++) {
-            System.out.println((i + 1) + ") " + products.get(i));
-        }
-
-        System.out.print("Choose product: ");
-        int pIndex = scanner.nextInt() - 1;
-        scanner.nextLine();
-
-        System.out.print("Quantity: ");
-        int qty = scanner.nextInt();
-        scanner.nextLine();
-
-        Customer c = customers.get(cIndex);
-        Product p = products.get(pIndex);
-
-        Order order = new Order(orders.size() + 100, p, c, qty);
-        order.completeOrder();
-
-        orders.add(order);
-        System.out.println("Order completed: " + order);
-    }
-
-
 
     private void showList(ArrayList<?> list) {
         if (list.isEmpty()) {
@@ -169,9 +189,37 @@ public class StoreConsoleManager implements StoreConsole {
         for (Object o : list) System.out.println(o);
     }
 
-    private void initializeData() {
-        products.add(new FreshProduct(100, 1, "Milk", 10, 5, 10));
-        customers.add(new Customer(1, "John", "123", 500));
-        orders.add(new Order(101, products.get(0), customers.get(0), 2));
+
+
+
+    private void searchByName() throws SQLException {
+        System.out.print("Enter name: ");
+        String name = scanner.nextLine();
+
+        List<Product> results = productDao.searchByName(name);
+        results.forEach(System.out::println);
+    }
+
+    private void searchByPriceRange() {
+        System.out.print("Min price: ");
+        double min = Double.parseDouble(scanner.nextLine());
+
+        System.out.print("Max price: ");
+        double max = Double.parseDouble(scanner.nextLine());
+
+        List<Product> results = productDao.searchByPriceRange(min, max);
+        results.forEach(System.out::println);
+    }
+
+
+    private void demonstratePolymorphism() throws SQLException {
+        List<Product> products = productDao.readAllProducts();
+
+        System.out.print("Quantity: ");
+        int qty = Integer.parseInt(scanner.nextLine());
+
+        for (Product p : products) {
+            System.out.println(p.getType() + " -> " + p.calculateTotal(qty));
+        }
     }
 }

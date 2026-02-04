@@ -10,10 +10,27 @@ public class PackagedProduct extends Product implements Discountable {
         setDiscountPercent(discountPercent);
     }
 
+    @Override
+    public String getType() {
+        return "Packaged Product";
+    }
+
+    @Override
+    public double getDiscountPercent() {
+        return discountPercent;
+    }
+
+    @Override
+    public double calculateTotal(int qty) {
+        double total = super.calculateTotal(qty);     // ✅ цена берётся через родителя
+        total *= (1 - discountPercent / 100.0);
+        return total;
+    }
+
     public String getBrand() { return brand; }
 
     public void setBrand(String brand) {
-        if (brand == null)
+        if (brand == null || brand.trim().isEmpty())
             throw new IllegalArgumentException("Brand cannot be empty");
         this.brand = brand.trim();
     }
@@ -24,11 +41,12 @@ public class PackagedProduct extends Product implements Discountable {
         this.discountPercent = discountPercent;
     }
 
-    @Override
-    public double getDiscountPercent() {
-        return discountPercent;
+    public boolean isPremiumBrand() {
+        return brand.length() >= 5;
     }
 
     @Override
-    public String getType() { return "Packaged Product"; }
+    public String toString() {
+        return super.toString() + ", brand=" + brand + ", discount=" + discountPercent + "%";
+    }
 }

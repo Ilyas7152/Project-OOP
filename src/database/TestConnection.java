@@ -1,15 +1,12 @@
 package database;
-import database.DatabaseConnection;
-
 
 import java.sql.Connection;
+import java.sql.SQLException;
 
-public class TestConnection{
-    public static void main(String[] args){
+public class TestConnection {
+    public static void main(String[] args) throws SQLException {
         Connection connection = DatabaseConnection.getConnection();
-        if (connection !=null){
-            System.out.println("Connected");
-            DatabaseConnection.closeConnection(connection);
-        } else{
-            System.out.println("Connection failed");
-        }}}
+        System.out.println("Connected ✅");
+        connection.close();
+    }
+}

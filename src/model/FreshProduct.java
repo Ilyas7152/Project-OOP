@@ -29,5 +29,20 @@ public class FreshProduct extends Product implements Discountable {
     }
 
     @Override
-    public String getType() { return "Fresh Product"; }
+    public String getType() {
+        return "Fresh Product";
+    }
+
+
+    @Override
+    public double calculateTotal(int qty) {
+        double total = super.calculateTotal(qty);
+        total *= (1 - discountPercent / 100.0);
+        return total;
+    }
+
+
+    public boolean isExpiringSoon() {
+        return daysToExpire <= 3;
+    }
 }

@@ -39,14 +39,11 @@ public class Order {
     }
 
     public double getTotalPrice() {
-        double total = product.getPrice() * quantity;
+        double total = product.calculateTotal(quantity); // polymorphism
+
 
         if (quantity >= 7) total *= 0.93;
         else if (quantity >= 3) total *= 0.97;
-
-        if (product instanceof Discountable d) {
-            total *= (1 - d.getDiscountPercent() / 100.0);
-        }
 
         return total;
     }
@@ -59,10 +56,10 @@ public class Order {
 
     @Override
     public String toString() {
-        return "Order(id: " + id +
-                ", product: " + product.getName() +
-                ", customer: " + customer.getName() +
-                ", qty: " + quantity +
-                ", total: " + getTotalPrice() + ")";
+        return "Order(id=" + id +
+                ", product=" + product.getName() +
+                ", customer=" + customer.getName() +
+                ", qty=" + quantity +
+                ", total=" + getTotalPrice() + ")";
     }
 }
