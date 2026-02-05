@@ -30,7 +30,8 @@ public class StoreConsoleManager implements StoreConsole {
         System.out.println("8) Delete product");
         System.out.println("9) Search by Name");
         System.out.println("10) Search by Price Range");
-        System.out.println("11) Polymorphism Demo");
+        System.out.println("11) Search by minimum Price");
+        System.out.println("12) Polymorphism demo");
         System.out.println("0) Exit");
         System.out.print("Choice: ");
     }
@@ -55,7 +56,8 @@ public class StoreConsoleManager implements StoreConsole {
                     case 8 -> deleteProduct();
                     case 9 -> searchByName();
                     case 10 -> searchByPriceRange();
-                    case 11 -> demonstratePolymorphism();
+                    case 11 -> searchByMinPrice();
+                    case 12 -> demonstratePolymorphism();
 
                     case 0 -> running = false;
                     default -> System.out.println("Invalid choice");
@@ -210,6 +212,20 @@ public class StoreConsoleManager implements StoreConsole {
         List<Product> results = productDao.searchByPriceRange(min, max);
         results.forEach(System.out::println);
     }
+    private void searchByMinPrice() {
+        System.out.print("Enter minimum price: ");
+        double minPrice = Double.parseDouble(scanner.nextLine());
+
+        List<Product> results = productDao.searchByMinPrice(minPrice);
+
+        if (results.isEmpty()) {
+            System.out.println("No products found.");
+            return;
+        }
+
+        results.forEach(System.out::println);
+    }
+
 
 
     private void demonstratePolymorphism() throws SQLException {
