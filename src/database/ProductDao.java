@@ -53,8 +53,64 @@ public boolean deleteProductById(int id)throws SQLException{
         return statement.executeUpdate()>0;
     }
 }
+public List<Product> searchByName(String name) throws SQLException{
+    List <Product> products = new ArrayList<>();
+    String sql ="SELECT * FROM product WHERE name = ILIKE ?";
+    try{Connection connection=DatabaseConnection.getConnection();
+        PreparedStatement statement = connection.prepareStatement(sql);{
+        statement.setString(1,"%"+name+"%");
+        ResultSet resultSet = statement.executeQuery();
+        while(resultSet.next()){
+            products.add(extractProductFromResultSet(resultSet));
+        }
+        statement.close();
+        resultSet.close();
+        DatabaseConnection.closeConnection(connection);}
+    }catch(SQLException e){
+        System.out.println("Search failed");
+        e.printStackTrace();
+    }return products;
+}
+public List <Product> searchByPriceRange(double min,double max){
+    List<Product> products =new ArrayList<>();
+    String sql ="SELECT * FROM product WHERE price BETWEEN ? AND ? ORDER BY id ASC";
+    try{Connection connection=DatabaseConnection.getConnection();
+        PreparedStatement statement= connection.prepareStatement(sql);
+        statement.setDouble(1,min);
+        statement.setDouble(2,max);
+        ResultSet resultSet = statement.executeQuery();
+        while(resultSet.next()){
+            Product product =extractProductFromResultSet(resultSet);
+products.add(extractProductFromResultSet(resultSet));
+        }
 
-
+        statement.close();
+        resultSet.close();
+        DatabaseConnection.closeConnection(connection);
+        System.out.println("Product found: " +products.size());
+    }
+    catch (SQLException e){
+        System.out.println("Search failed");
+        e.printStackTrace();
+    }
+    return products;
+}
+public List<Product> searchByMinPrice(double minPrice) {
+    List<Product> products =new ArrayList<>();
+    String sql ="SELECT * FROM product WHERE price >=? ORDER BY price ASC ";
+    try{Connection connection=DatabaseConnection.getConnection();
+        PreparedStatement statement= connection.prepareStatement(sql);{
+            statement.setDouble(1,minPrice);
+        ResultSet resultSet = statement.executeQuery();
+        while(resultSet.next()){
+            products.add(extractProductFromResultSet(resultSet));
+        }}}
+        catch(SQLException e) {
+            e.printStackTrace();
+            System.out.println("Search failed");
+        }
+    return products;
+}
 private Product extractProductFromResultSet(ResultSet resultSet)throws SQLException{
     int id =resultSet.getInt("id");
     String name=resultSet.getString("name");
