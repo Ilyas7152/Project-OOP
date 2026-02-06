@@ -8,7 +8,7 @@ import java.util.List;
 
 public class ProductDao {
 public void  createProduct(Product product)throws SQLException {
-    String sql = "INSERT INTO product (id=?,name=?,stock=?,price=?) VALUES(?,?,?,?)";
+    String sql = "INSERT INTO product (id,name,stock,price) VALUES(?,?,?,?)";
     try (Connection connection = DatabaseConnection.getConnection();
          PreparedStatement statement = connection.prepareStatement(sql)) {
         statement.setInt(1, product.getId());
@@ -20,7 +20,7 @@ public void  createProduct(Product product)throws SQLException {
 }
 public List<Product> readAllProducts()throws SQLException{
     List<Product> products = new ArrayList<>();
-    String sql = "SELECT * FROM products WHERE id =?";
+    String sql = "SELECT * FROM product ";
     try(Connection connection=DatabaseConnection.getConnection();
         PreparedStatement statement = connection.prepareStatement(sql);
         ResultSet rs = statement.executeQuery()){
