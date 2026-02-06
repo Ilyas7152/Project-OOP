@@ -23,15 +23,12 @@ public class StoreConsoleManager implements StoreConsole {
         System.out.println("1) Add Fresh Product");
         System.out.println("2) Add Packaged Product");
         System.out.println("3) View All Products");
-        System.out.println("4) Add new customer");
-        System.out.println("5) Show orders");
-        System.out.println("6) Show customers");
-        System.out.println("7) Update product");
-        System.out.println("8) Delete product");
-        System.out.println("9) Search by Name");
-        System.out.println("10) Search by Price Range");
-        System.out.println("11) Search by minimum Price");
-        System.out.println("12) Polymorphism demo");
+        System.out.println("4) Update product");
+        System.out.println("5) Delete product");
+        System.out.println("6) Search by Name");
+        System.out.println("7) Search by Price Range");
+        System.out.println("8) Search by minimum Price");
+        System.out.println("9) Polymorphism demo");
         System.out.println("0) Exit");
         System.out.print("Choice: ");
     }
@@ -49,15 +46,12 @@ public class StoreConsoleManager implements StoreConsole {
                     case 1 -> addFreshProduct();
                     case 2 -> addPackagedProduct();
                     case 3 -> readAllProducts();
-                    case 4 -> addNewCustomer();
-                    case 5 ->showList(orders);
-                    case 6 -> showList(customers);
-                    case 7 -> updateProduct();
-                    case 8 -> deleteProduct();
-                    case 9 -> searchByName();
-                    case 10 -> searchByPriceRange();
-                    case 11 -> searchByMinPrice();
-                    case 12 -> demonstratePolymorphism();
+                    case 4 -> updateProduct();
+                    case 5 -> deleteProduct();
+                    case 6 -> searchByName();
+                    case 7 -> searchByPriceRange();
+                    case 8 -> searchByMinPrice();
+                    case 9 -> demonstratePolymorphism();
 
                     case 0 -> running = false;
                     default -> System.out.println("Invalid choice");
